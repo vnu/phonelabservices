@@ -25,7 +25,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.DUMP"/>
+    <uses-permission android:name="android.permission.DUMP" />
     <!-- Recovery System needs the following two permissions -->
     <uses-permission android:name="android.permission.ACCESS_CACHE_FILESYSTEM" />
     <uses-permission android:name="android.permission.REBOOT" />
@@ -108,6 +108,8 @@
         <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorLocation" >
         </service>
         <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorCellLocation" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.Dump" >
         </service>
         <service android:name="edu.buffalo.cse.phonelab.utilities.UploadLogs" >
         </service>

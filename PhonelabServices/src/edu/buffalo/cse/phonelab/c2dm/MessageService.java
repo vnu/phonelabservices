@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
@@ -40,7 +39,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -51,24 +49,13 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.os.SystemClock;
-//Recovery system needs android.os.RecoverySystem
-import android.os.RecoverySystem;
-import android.os.Build.VERSION;
-import android.app.DownloadManager;
-import android.net.Uri;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
-import android.widget.Toast;
-
 import android.util.Log;
 import edu.buffalo.cse.phonelab.manifest.PhoneLabApplication;
 import edu.buffalo.cse.phonelab.manifest.PhoneLabManifest;
 import edu.buffalo.cse.phonelab.manifest.PhoneLabParameter;
+import edu.buffalo.cse.phonelab.ota.OTADownloader;
 import edu.buffalo.cse.phonelab.phonelabservices.PeriodicCheckReceiver;
 import edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorReceiver;
 import edu.buffalo.cse.phonelab.utilities.DownloadFile;
@@ -85,21 +72,6 @@ public class MessageService extends IntentService
 	{
 		super("MessageService");
 	}
-
-	private BroadcastReceiver	completeReceiver	= new BroadcastReceiver()
-													{
-														@Override
-														public void onReceive(
-																Context context,
-																Intent intent)
-														{
-															Toast.makeText(
-																	context,
-																	"Downloading the file completes",
-																	Toast.LENGTH_SHORT)
-																	.show();
-														}
-													};
 
 	@Override
 	protected void onHandleIntent(Intent intent)
@@ -221,92 +193,12 @@ public class MessageService extends IntentService
 			}
 			else if (message.equals("recovery_system"))
 			{
+				//start the OTA download service
+				Intent otaDownloadServiceIntent = new Intent(getApplicationContext(), OTADownloader.class);
+				otaDownloadServiceIntent.putExtra(Util.OTA_DOWNLOAD, Util.OTA_DOWNLOAD_URL+"ota.zip");
+				getApplicationContext().startService(otaDownloadServiceIntent);
 
-				if (isDownloadManagerAvailable(getApplicationContext()))
-				{
-					getApplicationContext();
-					DownloadManager downloadmanager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-
-					/*
-					 * if(isDownloadManagerAvailable(getApplicationContext())){
-					 * DownloadManager downloadmanager = (DownloadManager)
-					 * getSystemService
-					 * (getApplicationContext().DOWNLOAD_SERVICE); >>>>>>>
-					 * 96b7c8865836b6dc722ca1bf85fbe2f808f40132
-					 * 
-					 * Log.i("PhoneLab-" + getClass().getSimpleName(),
-					 * "Check versions successfully"); File packageFile = new
-					 * File(Environment.getDownloadCacheDirectory() +
-					 * "/update.zip"); DownloadManager.Request request = new
-					 * DownloadManager.Request(Uri.parse(Util.OTA_DOWNLOAD_URL +
-					 * "update.zip"));
-					 * 
-					 * request.setAllowedNetworkTypes(DownloadManager.Request.
-					 * NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-					 * request.setDescription("Download OTA Image");
-					 * request.setTitle("OTA Update");
-					 * request.setAllowedOverRoaming(false);
-					 * request.setShowRunningNotification(true);
-					 * if(Build.VERSION.SDK_INT >=
-					 * Build.VERSION_CODES.HONEYCOMB) {
-					 * request.allowScanningByMediaScanner();
-					 * //VISIBILITY_HIDDEN, VISIBILITI_VISIBLE and
-					 * VISIBILITY_VISIBLE_NOTIFY_COMPLETED
-					 * request.setNotificationVisibility
-					 * (DownloadManager.Request.
-					 * VISIBILITY_VISIBLE_NOTIFY_COMPLETED); }
-					 * 
-					 * //request.setDestinationInExternalPublicDir(Environment.
-					 * getDownloadCacheDirectory(), "update.zip");
-					 * request.setDestinationUri(Uri.fromFile(packageFile));
-					 * Log.i("PhoneLab-" + getClass().getSimpleName(),
-					 * "(public) Download update.zip successfully");
-					 * //request.setDestinationInExternalPublicDir
-					 * (Environment.DIRECTORY_DOWNLOADS, "ota.zip");
-					 * 
-					 * // get id from enqueue long id =
-					 * downloadmanager.enqueue(request); }
-					 * 
-					 * 
-					 */
-					
-					Log.i("PhoneLab-" + getClass().getSimpleName(),
-							"Starting new image download");
-					if (DownloadFile.downloadToDirectory(this,
-							Util.OTA_DOWNLOAD_URL + "ota.zip",
-							Environment.getDownloadCacheDirectory()
-									+ "/ota.zip"))
-					{
-						File packageFile = new File(
-								Environment.getDownloadCacheDirectory()
-										+ "/ota.zip");
-						
-						Log.i("PhoneLab-" + getClass().getSimpleName(),
-								"Download done installing image");
-						
-						//TODO anand- need to have some file integrity check
-						
-						//sending OTA download confirmation messages here
-						Log.i("PhoneLab-" + getClass().getSimpleName(), "Sending OTA download confirmation message ");
-						sendOTAmonitoringMessage("O", "1");
-						
-						//TODO - anand have some notification dialog instead of the phone directly going into recovery 
-						
-						try
-						{
-							sendOTAmonitoringMessage("O", "2");
-							RecoverySystem.installPackage(
-									getApplicationContext(), packageFile);
-						}
-						catch (IOException e)
-						{
-							e.printStackTrace();
-						}
-					}
-					else{
-						//notify server that download has failed.
-					}
-
+				
 				}
 				else if (message.equals("upload_manifest"))
 				{ // Send updated manifest to the server
@@ -411,7 +303,7 @@ public class MessageService extends IntentService
 							type);
 					editor.commit();
 				}
-			}
+			
 		}
 		catch (JSONException jsone)
 		{

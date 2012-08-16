@@ -25,7 +25,8 @@ import edu.buffalo.cse.phonelab.utilities.Util;
 
 public class StatusMonitor extends Service {
 
-	private long runInterval = 0;//this will be in miliseconds
+	private long runInterval = 0;// this will be in miliseconds
+	public static ArrayList<String> dumpServices;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -39,28 +40,33 @@ public class StatusMonitor extends Service {
 		PhoneLabManifest manifest = new PhoneLabManifest(Util.CURRENT_MANIFEST_DIR, getApplicationContext());
 		if (manifest.getManifest()) {
 			try {
+				// Retrieve the dumpServices commands from manifets and stores
+				// it in a static ArrayList<String>
+				dumpServices = manifest.getDumpServices();
+
 				HashMap<String, String> constraintMap = new HashMap<String, String>();
 				constraintMap.put("name", "runInterval");
 				ArrayList<PhoneLabParameter> parameters = manifest.getStatParamaterByConstraints(constraintMap);
+
 				if (parameters.size() == 1) {
 					PhoneLabParameter param = parameters.get(0);
 
 					if (param.getUnits() != null && param.getValue() != null) {
 						long value = Long.parseLong(param.getValue());
 						String units = param.getUnits();
-						
 
 						Log.i("PhoneLab-" + getClass().getSimpleName(), "Value: " + value + " - unit: " + units);
 
 						if (units.equals("hour")) {
-							runInterval = value *  60 * 60 * 1000;
+							runInterval = value * 60 * 60 * 1000;
 						} else if (units.equals("min")) {
 							runInterval = value * 60 * 1000;
 						} else if (units.equals("sec")) {
 							runInterval = value * 1000;
-						} else if (units.equals("milisec")) {
+						} else if (units.equals("millisec")) {
 							runInterval = value;
 						}
+
 						Log.i("PhoneLab-" + getClass().getSimpleName(), "Running interval: " + runInterval);
 
 						Intent locationIntent = new Intent(getApplicationContext(), StatusMonitorLocation.class);
@@ -71,25 +77,28 @@ public class StatusMonitor extends Service {
 						this.startService(signalIntent);
 						Intent cellLocationIntent = new Intent(getApplicationContext(), StatusMonitorCellLocation.class);
 						this.startService(cellLocationIntent);
-						
+						Intent DumpIntent = new Intent(getApplicationContext(), StatusMonitorDump.class);
+						this.startService(DumpIntent);
+
 						rescheduleMonitoring();
 					}
 				}
+
 			} catch (XPathExpressionException e) {
-				Log.e(getClass().getSimpleName(),e.toString());
+				Log.e(getClass().getSimpleName(), e.toString());
 			}
 		}
-		
 		Locks.releaseWakeLock();
-		
+
 		this.stopSelf();
-		
+
 		return START_STICKY;
 	}
 
 	/**
-	 * Internal method for setting an alarm to wake the service up after runInterval amount 
-	 * If there exist an already set up alarm, it will first cancel it 
+	 * Internal method for setting an alarm to wake the service up after
+	 * runInterval amount If there exist an already set up alarm, it will first
+	 * cancel it
 	 */
 	private void rescheduleMonitoring() {
 		Log.i("PhoneLab-" + getClass().getSimpleName(), "Rescheduling status monitoring...");
@@ -97,5 +106,5 @@ public class StatusMonitor extends Service {
 		Intent newIntent = new Intent(getApplicationContext(), StatusMonitorReceiver.class);
 		PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + runInterval, pending);
-	} 
+	}
 }

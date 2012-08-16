@@ -27,7 +27,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -85,13 +84,33 @@ public class PeriodicCheckService extends IntentService {
 		}
 
 		//Check Status Monitoring
-		Intent newIntent = new Intent(getApplicationContext(), StatusMonitorReceiver.class);
+		/*Intent newIntent = new Intent(getApplicationContext(), StatusMonitorReceiver.class);
 		PendingIntent pendingTest = PendingIntent.getBroadcast(getApplicationContext(), 0, newIntent, PendingIntent.FLAG_NO_CREATE);
 		if (pendingTest == null) {
 			AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 			PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), pending);
+		}*/
+		
+		//Duplicate Status Monitoring Check
+		/*Intent statusIntent = new Intent(getApplicationContext(), edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorReceiver.class);
+		PendingIntent statusPendingTest = PendingIntent.getBroadcast(getApplicationContext(), 0, statusIntent, PendingIntent.FLAG_NO_CREATE);
+		if (statusPendingTest == null) {
+			AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+			PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, statusIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+			mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), pending);
 		}
+		*/
+		if (!isMyServiceRunning("edu.buffalo.cse.phonelab.statusmonitors.StatusMonitor")) {
+			Log.w("PhoneLab-" + getClass().getSimpleName(), "SM Service is not running starting now...");
+			Intent service = new Intent(getApplicationContext(), edu.buffalo.cse.phonelab.statusmonitors.StatusMonitor.class);
+			this.startService(service);
+		} else {
+			Log.i("PhoneLab-" + getClass().getSimpleName(), "SM Service is running");
+		}
+		
+		
+		
 		
 		
 		//Check connection and power for uploading log files

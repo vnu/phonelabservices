@@ -12,6 +12,7 @@ public class PhoneLabParameter {
 	private String value;
 	private String units;
 	private String setBy;
+	private String wakelock;
 	
 	public String getName() {
 		return name;
@@ -42,7 +43,14 @@ public class PhoneLabParameter {
 		return 	"name: " + getName() + "\n" +
 				"value: " + getValue() + "\n" +
 				"units: " + getUnits() + "\n" + 
-				"setBy: " + getSetBy() + "\n";
+				"setBy: " + getSetBy() + "\n" +
+				"wakelock: " + getWakelock() + "\n";
+	}
+	public String getWakelock() {
+		return wakelock;
+	}
+	public void setWakelock(String wakelock) {
+		this.wakelock = wakelock;
 	}
 	
 }

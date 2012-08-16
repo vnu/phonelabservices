@@ -4,7 +4,7 @@
     android:versionCode="1"
     android:versionName="1" >
 
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk android:minSdkVersion="9" />
 
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
@@ -66,15 +66,7 @@
         </service>
         <service android:name="edu.buffalo.cse.phonelab.c2dm.RegistrationService" >
         </service>
-        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorBattery" >
-        </service>
-        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorSignal" >
-        </service>
-        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitor" >
-        </service>
 
-        <receiver android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorReceiver" >
-        </receiver>
         <receiver android:name="edu.buffalo.cse.phonelab.receivers.WiFiReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
@@ -105,12 +97,50 @@
 
         <service android:name="edu.buffalo.cse.phonelab.phonelabservices.PeriodicCheckService" >
         </service>
+
+        <!-- Status Monitor Receiver and Services -->
+
+        <receiver android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorReceiver" >
+        </receiver>
+
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorBattery" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorSignal" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitor" >
+        </service>
         <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorLocation" >
         </service>
         <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorCellLocation" >
         </service>
-        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.Dump" >
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitor.StatusMonitorDump" >
         </service>
+        <service android:name="edu.buffalo.cse.phonelab.utilities.UploadLogs" >
+        </service>
+        <!-- End of Status Monitor -->
+
+
+        <!-- Status Monitor Receiver and Services Duplicate statusMonitors -->
+        <receiver android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorReceiver" >
+        </receiver>
+
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorBattery" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorSignal" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitor" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorLocation" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorCellLocation" >
+        </service>
+        <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusMonitorDump" >
+        </service>
+         <service android:name="edu.buffalo.cse.phonelab.statusmonitors.StatusServices" >
+        </service>
+
+        <!-- End of Duplicate -->
+
         <service android:name="edu.buffalo.cse.phonelab.utilities.UploadLogs" >
         </service>
 

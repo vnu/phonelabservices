@@ -32,6 +32,12 @@ public class Util {
 	public static final String SHARED_PREFERENCES_SETTINGS_POWER_FOR_LOG = "log_power";
 	public static final String SHARED_PREFERENCES_POWER_CONNECTED = "power_connected";
 	public static final String SHARED_PREFERENCES_LOCATION_SOURCE = "location_source";//possible values: network, gps, both
+	
+	
+	//Status Monitor Constants
+	public static final String STATUS_TAG="Phonelab-";
+	public final static String DUMP_DIR = ".dump";
+	
 	//added for logcat filters
 	public static final String SHARED_PREFERENCES_LOGCAT_FILTERS = "logcat_filters";
 	
